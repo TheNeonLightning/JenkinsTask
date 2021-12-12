@@ -1,0 +1,42 @@
+---
+- name: Deploy application
+  hosts: all
+  become: yes
+  
+  tasks:
+  
+  - block: # Debian
+    - name: Create a directory if it does not exist
+      file:
+        path: "{{ app_dest_dir_path }}"
+        state: directory
+        mode: '0755'
+  
+    - name: copies the jar file over
+      copy: src={{ app_src_path }} dest={{ app_dest_dir_path }}/app.jar
+      
+    - shell: java -jar {{ app_dest_dir_path }}/app.jar
+      register: debian_output
+      
+    - debug: var=debian_output 
+        
+    when: ansible_os_family == "Debian" 
+    
+  - block: # CentOS
+    - name: Create a directory if it does not exist
+      file:
+        path: "{{ app_dest_dir_path }}"
+        state: directory
+        mode: '0755'
+  
+    - name: copies the jar file over
+      copy: src={{ app_src_path }} dest={{ app_dest_dir_path }}/app.jar
+      
+    - shell: java -jar {{ app_dest_dir_path }}/app.jar
+      register: cent_os_output
+      
+    - debug: var=cent_os_output  
+      
+    when: ansible_os_family == "RedHat"     
+...
+
